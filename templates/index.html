@@ -1,14 +1,27 @@
-<table border="1">
-    <tr>
-        {% for col in data[0].keys() %}
-            <th>{{ col }}</th>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Manager</title>
+</head>
+<body>
+    <h1>Tables in Database:</h1>
+    <ul>
+        {% for table in tables %}
+            <li>{{ table }}</li>
         {% endfor %}
-    </tr>
-    {% for row in data %}
-    <tr>
-        {% for value in row.values() %}
-            <td>{{ value }}</td>
-        {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
+    </ul>
+
+    <h2>Insert Data into JM_WS_Users</h2>
+    <form action="/insert" method="post">
+        <label for="sql_query">Enter SQL INSERT Statement:</label><br>
+        <textarea id="sql_query" name="sql_query" rows="4" cols="50"></textarea><br>
+        <button type="submit">Execute</button>
+    </form>
+
+    {% if request.args.get('message') %}
+        <p>{{ request.args.get('message') }}</p>
+    {% endif %}
+</body>
+</html>

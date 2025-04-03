@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, render_template, redirect, url_for
 import mysql.connector
 
 app = Flask(__name__)
@@ -13,27 +13,32 @@ def get_db_connection():
 
 @app.route('/')
 def index():
-    # Connect to the database
     conn = get_db_connection()
-    
-    # Create a cursor object to interact with the database
     cursor = conn.cursor()
-    
-    # Query to get the names of all tables in the database
     cursor.execute("SHOW TABLES")
-    
-    # Fetch all the table names
     tables = cursor.fetchall()
-    
-    # Close the cursor and the connection
     cursor.close()
     conn.close()
     
-    # Format the table names into a string to display on the webpage
-    table_names = "<br>".join([table[0] for table in tables])
+    return render_template("index.html", tables=[table[0] for table in tables])
+
+@app.route('/insert', methods=['POST'])
+def insert():
+    sql_query = request.form['sql_query']
     
-    # Return the names of the tables as the response
-    return f"<h1>Tables in Database:</h1><p>{table_names}</p>"
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(sql_query)
+        conn.commit()
+        message = "Query executed successfully!"
+    except Exception as e:
+        message = f"Error: {e}"
+    finally:
+        cursor.close()
+        conn.close()
+    
+    return redirect(url_for('index', message=message))
 
 if __name__ == '__main__':
     app.run(debug=True)
